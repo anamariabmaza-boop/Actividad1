@@ -1,4 +1,6 @@
 package org.example;
+import Persona.Exception.PersonaException;
+
 import java.time.LocalDate;
 public class Persona {
     private String nombre;
@@ -18,6 +20,21 @@ public class Persona {
     }
 
     public static Persona create(String nombre, String apellido, LocalDate fechaNacimiento, String dni, float altura, float peso) {
+        if (nombre == null || nombre.isEmpty()) {
+            throw new PersonaException("El nombre no puede ser nulo");
+        }
+        if (apellido == null || apellido.isEmpty()) {
+            throw new PersonaException("El apellido no puede ser nulo");
+        }
+        if (altura <= 0) {
+            throw new PersonaException("La altura debe ser mayor a 0");
+        }
+        if (peso <= 0) {
+            throw new PersonaException("El peso debe ser mayor a 0");
+        }
+        if(fechaNacimiento.isAfter(LocalDate.now())) {
+            throw new PersonaException("La fecha no debe ser futura");
+        }
         return new Persona(nombre, apellido, fechaNacimiento, dni, altura, peso);
     }
 

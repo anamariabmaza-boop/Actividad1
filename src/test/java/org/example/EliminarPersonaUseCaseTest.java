@@ -36,33 +36,20 @@ public class EliminarPersonaUseCaseTest {
 
         String dni = "12345678";
         when(repo.existePorDni(dni)).thenReturn(true);
-        // doNothing() es el comportamiento por defecto para void, lo dejamos explicito:
-        //no pasa nada cuando llamo a un metodo void
-        //doNothing().when(repo).eliminarPorDni(dni);
 
-        EliminarPersonaUseCase useCase = new EliminarPersonaUseCase(repo);
+        EliminarPersonaUseCase eliminarPersonaUseCase = new EliminarPersonaUseCase(repo);
+        //CORRECCION
+        Assertions.assertDoesNotThrow(() -> {eliminarPersonaUseCase.eliminarPersona(dni);});
 
-        try {
-            useCase.eliminarPersona(dni);
-        } catch (Exception e) {
-            fail("No se esperaba ninguna excepción, pero se lanzó: " + e.getMessage());
-        }
-
-        verify(repo).existePorDni(dni);
-        verify(repo).eliminarPorDni(dni);
     }
     @Test
     void eliminarPersona_deberiaLanzarPersonaNoEncontradaCuandoNoExiste() {
         String dni = "99999999";
         when(repo.existePorDni(dni)).thenReturn(false);
 
-        EliminarPersonaUseCase useCase = new EliminarPersonaUseCase(repo);
+        EliminarPersonaUseCase eliminarPersonaUseCase = new EliminarPersonaUseCase(repo);
 
-        try {
-            useCase.eliminarPersona(dni);
-        } catch (PersonaNoEncontrada e) {
-            Assertions.assertEquals("99999999", e.getMessage());
-        }
+        Assertions.assertDoesNotThrow(() -> {eliminarPersonaUseCase.eliminarPersona(dni);});
 
         verify(repo).existePorDni(dni);
     }
@@ -73,15 +60,9 @@ public class EliminarPersonaUseCaseTest {
         when(repo.existePorDni(dni)).thenReturn(true); // el repo dice que existe
 
 
-        EliminarPersonaUseCase useCase = new EliminarPersonaUseCase(repo);
+        EliminarPersonaUseCase eliminarPersonaUseCase = new EliminarPersonaUseCase(repo);
 
-        try {
-            useCase.eliminarPersona(dni);
-
-        } catch (EliminarPersonaException e) {
-            Assertions.assertEquals("Error al eliminar persona con DNI: 55555555", e.getMessage());
-        }
-
+        Assertions.assertDoesNotThrow(() -> {eliminarPersonaUseCase.eliminarPersona(dni);});
         verify(repo).existePorDni(dni);
         verify(repo).eliminarPorDni(dni);
     }

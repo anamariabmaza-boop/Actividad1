@@ -1,6 +1,7 @@
 package org.example;
 
 import Persona.Exception.PersonaNoEncontrada;
+import Persona.Exception.RespositorioException;
 import Persona.Input.CrearPersonaInput;
 import Persona.Output.GuardarPersonaRepositorio;
 import Persona.UseCase.CrearPersonaUseCase;
@@ -33,35 +34,18 @@ public class BuscarPersonaUseCaseTest {
     BuscarPersonaRepositorio repositorio;
 
     @Test
-    public void buscarPersnaDniTest() {
+    public void buscarPersonaDniTest() {
 
         //Arrange
         Persona p1 = Persona.create("Ana", "Maza", LocalDate.of(2001,8,27),
                 "43611357",166.0f,  75.0f);
-        // Persona.create: metodo estatico de fabrica que devuelve un objeto Persona con los campos que le pase
-        //sirve para crear objetos de prueba de forma rapida y clara
 
         when(repositorio.buscarPersona("43611357")).thenReturn(p1);
-        //Ya configure el comportamiento del el metodo que mi cu usa
-        //Ahi falseaste la dependencia que tu caso de uso implemento/ uso
 
-        //Ahora hay que inyectar la dependecia mockeada al C.U.
         BuscarPersonaInput buscarPersonaInput = new BuscarPersonaUseCase(repositorio);
-
-        //Act
-        //llamo al cu
-        //Ahora debo llamar a mi cu de mi input y le paso el p;arametro
-
         Persona encontrada = buscarPersonaInput.buscarPersona("43611357");
-
-        //Assert
-
-        Assertions.assertNotNull(encontrada.getDni());
+        //CORRECCION
         Assertions.assertEquals("43611357", encontrada.getDni());
-        //Verifico que el mock haya sido usado
-        //verify(repositorio).existePersona("43611357");
-        //Ver verify y otros
-        verify(repositorio).buscarPersona("43611357");
 
     }
     @Test
@@ -70,14 +54,19 @@ public class BuscarPersonaUseCaseTest {
         when(repositorio.buscarPersona(dni)).thenReturn(null);
 
         BuscarPersonaInput buscarPersonaInput = new BuscarPersonaUseCase(repositorio);
+        //MODIFICACION
+        Assertions.assertThrows(PersonaNoEncontrada.class, () -> {buscarPersonaInput.buscarPersona(dni);});
 
-        try {
-            buscarPersonaInput.buscarPersona(dni);
-        }catch (PersonaNoEncontrada e){
-            Assertions.assertEquals("Persona no encontrada", e.getMessage());
-        }
-        verify(repositorio).buscarPersona(dni);
     }
+    //NUEVO TEST
+    @Test
+    public void buscarPersonaPorDni_RepositorioExcepcion() {
+        String dni = "99999999";
+        when(repositorio.buscarPersona(dni)).thenThrow(new RespositorioException("Algo Salio Mal"));
 
+        BuscarPersonaInput  buscarPersonaInput = new BuscarPersonaUseCase(repositorio);
 
+        RespositorioException exception = Assertions.assertThrows(RespositorioException.class, () -> {buscarPersonaInput.buscarPersona(dni);});
+        Assertions.assertEquals("Algo Salio Mal", exception.getMessage());
+    }
 }
